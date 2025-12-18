@@ -62,15 +62,19 @@ Your API key is: `AIzaSyAXC5jsJFwYqx_D5ZfpiolxqLY28O0KhPg`
 5. Under **"Application restrictions"**:
    - Select **"HTTP referrers (web sites)"**
    - Click **"ADD AN ITEM"**
-   - Add these referrers:
-     - `localhost:3000/*`
-     - `localhost:*/*`
-     - `127.0.0.1:*/*`
-     - `http://localhost:3000/*`
-     - `https://localhost:3000/*`
-   - For production, also add your domain:
+   - **Add these referrers (choose what you need):**
+     - **Required for development:**
+       - `localhost:3000/*` ← **Add this one (your dev server)**
+     - **Optional but recommended:**
+       - `localhost:*/*` ← Allows any port (useful if you change ports)
+       - `127.0.0.1:*/*` ← IP address version (backup)
+     - **Usually not needed (but safe to add):**
+       - `http://localhost:3000/*`
+       - `https://localhost:3000/*`
+   - **For production, also add your domain:**
      - `yourdomain.com/*`
      - `*.yourdomain.com/*`
+   - **💡 Tip:** Start with just `localhost:3000/*` - you can add more later if needed
 6. Click **"SAVE"**
 
 ### Step 4: Enable Billing (REQUIRED - But FREE!)
@@ -102,8 +106,9 @@ Your API key is: `AIzaSyAXC5jsJFwYqx_D5ZfpiolxqLY28O0KhPg`
 - **Fix**: Enable Places API (Step 1 above)
 
 ### "RefererNotAllowedMapError"
-- **Fix**: Add `localhost:3000/*` to API key restrictions (Step 3)
-
+- **Fix**: Add referrers to API key restrictions (Step 3)
+- **Minimum required:** `localhost:3000/*`
+- **Recommended:** Also add `localhost:*/*` and `127.0.0.1:*/*` for flexibility
 ### "BillingNotEnabledMapError"
 - **Fix**: Enable billing (Step 4 above)
 
