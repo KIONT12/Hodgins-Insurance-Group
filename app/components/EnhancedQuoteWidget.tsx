@@ -31,7 +31,6 @@ interface AddressData {
 export default function EnhancedQuoteWidget() {
   const [step, setStep] = useState(1);
   const [addressData, setAddressData] = useState<AddressData | null>(null);
-  const [mapLocation, setMapLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [addressInputValue, setAddressInputValue] = useState('');
   const [propertyData, setPropertyData] = useState({
     squareFeet: '',
@@ -48,16 +47,12 @@ export default function EnhancedQuoteWidget() {
   const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [autocomplete, setAutocomplete] = useState<any>(null);
-  const [isLoadingMap, setIsLoadingMap] = useState(false);
   const [, setQuotePreview] = useState({ annual: null as number | null, monthly: null as number | null });
   const [reviewDate, setReviewDate] = useState('');
   const [reviewTime, setReviewTime] = useState('');
   const [mapsApiError, setMapsApiError] = useState(false);
   const [allowManualEntry, setAllowManualEntry] = useState(false);
 
-  const mapRef = useRef<HTMLDivElement>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mapInstanceRef = useRef<any>(null);
   const addressInputRef = useRef<HTMLInputElement>(null);
 
   const squareFeetOptions = useMemo(
@@ -346,7 +341,6 @@ export default function EnhancedQuoteWidget() {
         } else {
           setAddressInputValue(addressInfo.formattedAddress);
         }
-        setMapLocation({ lat: addressInfo.lat, lng: addressInfo.lng });
         // Real quotes will be fetched after form submission
         setQuotePreview({ annual: null, monthly: null });
         setErrors({});
@@ -457,7 +451,6 @@ export default function EnhancedQuoteWidget() {
         const address = JSON.parse(savedAddress);
         setAddressData(address);
         setAddressInputValue(address.formattedAddress);
-        setMapLocation({ lat: address.lat, lng: address.lng });
         if (savedContactData) {
           setStep(4);
         } else if (savedPropertyData) {
@@ -648,17 +641,12 @@ export default function EnhancedQuoteWidget() {
 
           setAddressData(parsedAddress);
           setAddressInputValue(parsedAddress.formattedAddress);
-          setMapLocation({ lat: parsedAddress.lat, lng: parsedAddress.lng });
           // Real quotes will be fetched after form submission
           setQuotePreview({ annual: null, monthly: null });
           setErrors({});
           
-          if (parsedAddress.lat && parsedAddress.lng) {
-            setIsLoadingMap(true);
-            setStep(3);
-          } else {
-            setStep(3);
-          }
+          // Skip map step, go directly to property details
+          setStep(3);
           
           sessionStorage.setItem('quoteAddress', JSON.stringify(parsedAddress));
         } else if (status === 'ZERO_RESULTS') {
@@ -948,7 +936,6 @@ export default function EnhancedQuoteWidget() {
   const handleStartOver = () => {
     setStep(1);
     setAddressData(null);
-    setMapLocation(null);
     setAddressInputValue('');
     setPropertyData({ squareFeet: '', yearBuilt: '' });
     setContactData({ fullName: '', phone: '', email: '', ownership: '' });
@@ -959,9 +946,6 @@ export default function EnhancedQuoteWidget() {
     sessionStorage.removeItem('quotePropertyData');
     sessionStorage.removeItem('quoteContactData');
     sessionStorage.removeItem('quotePremiums');
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current = null;
-    }
     if (addressInputRef.current) {
       addressInputRef.current.value = '';
       // Clear autocomplete initialization flag to allow re-initialization

@@ -85,20 +85,51 @@ export default function Footer() {
               </div>
               <h4 className="text-white font-bold text-lg sm:text-xl">Contact</h4>
             </div>
-            <ul className="space-y-2 text-sm sm:text-base">
-              <li>
-                <a href="tel:7722444350" className="flex items-center gap-2 hover:text-orange-400 transition-colors group">
-                  <span className="w-1.5 h-1.5 bg-orange-500 rounded-full group-hover:scale-150 transition-transform" />
-                  772.244.4350
-                </a>
-              </li>
-              <li>
-                <a href="mailto:info@hodgins.insure" className="flex items-center gap-2 hover:text-orange-400 transition-colors group">
-                  <span className="w-1.5 h-1.5 bg-orange-500 rounded-full group-hover:scale-150 transition-transform" />
-                  info@hodgins.insure
-                </a>
-              </li>
-            </ul>
+            <div className="space-y-4 text-sm sm:text-base">
+              {/* Chris Hodgins Contact */}
+              <div>
+                <p className="text-white font-semibold mb-2">Chris Hodgins</p>
+                <ul className="space-y-1.5">
+                  <li>
+                    <a href="tel:7722444184" className="flex items-center gap-2 hover:text-orange-400 transition-colors group">
+                      <span className="w-1.5 h-1.5 bg-orange-500 rounded-full group-hover:scale-150 transition-transform" />
+                      Phone/Text: 772.244.4184
+                    </a>
+                  </li>
+                  <li>
+                    <a href="tel:7722444350" className="flex items-center gap-2 hover:text-orange-400 transition-colors group">
+                      <span className="w-1.5 h-1.5 bg-orange-500 rounded-full group-hover:scale-150 transition-transform" />
+                      Office: 772.244.4350
+                    </a>
+                  </li>
+                  <li>
+                    <a href="mailto:chris@hodgins.insure" className="flex items-center gap-2 hover:text-orange-400 transition-colors group">
+                      <span className="w-1.5 h-1.5 bg-orange-500 rounded-full group-hover:scale-150 transition-transform" />
+                      chris@hodgins.insure
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              
+              {/* Customer Service */}
+              <div className="pt-3 border-t border-white/10">
+                <p className="text-white font-semibold mb-2">Customer Service</p>
+                <ul className="space-y-1.5">
+                  <li>
+                    <a href="mailto:customerservice@hodgins.insure" className="flex items-center gap-2 hover:text-orange-400 transition-colors group">
+                      <span className="w-1.5 h-1.5 bg-orange-500 rounded-full group-hover:scale-150 transition-transform" />
+                      customerservice@hodgins.insure
+                    </a>
+                  </li>
+                  <li>
+                    <a href="tel:7722444350" className="flex items-center gap-2 hover:text-orange-400 transition-colors group">
+                      <span className="w-1.5 h-1.5 bg-orange-500 rounded-full group-hover:scale-150 transition-transform" />
+                      772.244.4350 x 102
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
 
