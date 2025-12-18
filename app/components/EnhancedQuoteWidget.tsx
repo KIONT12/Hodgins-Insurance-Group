@@ -350,8 +350,8 @@ export default function EnhancedQuoteWidget() {
         // Real quotes will be fetched after form submission
         setQuotePreview({ annual: null, monthly: null });
         setErrors({});
-        setIsLoadingMap(true);
-        setStep(2);
+        // Skip map step, go directly to property details
+        setStep(3);
         sessionStorage.setItem('quoteAddress', JSON.stringify(addressInfo));
       });
       
@@ -444,112 +444,7 @@ export default function EnhancedQuoteWidget() {
   }, [addressInputValue, step, autocomplete, allowManualEntry]);
 
 
-  // Initialize map
-  useEffect(() => {
-    if (step === 2 && mapLocation && mapLocation.lat && mapLocation.lng && mapRef.current && !mapInstanceRef.current) {
-      // If no Google Maps, skip to next step
-      if (!window.google || !window.google.maps) {
-        console.log('Google Maps not available, skipping map step');
-        setIsLoadingMap(false);
-        setTimeout(() => setStep(3), 1000);
-        return;
-      }
-
-      setIsLoadingMap(true);
-      
-      // Add timeout to prevent infinite loading
-      const loadingTimeout = setTimeout(() => {
-        console.warn('Map loading timeout, continuing without map');
-        setIsLoadingMap(false);
-        setErrors({ map: 'Map took too long to load. Continuing...' });
-        setTimeout(() => setStep(3), 500);
-      }, 10000); // 10 second timeout
-
-      try {
-        // Wait a bit for Google Maps to be fully ready
-        const initMap = () => {
-          try {
-            if (!mapRef.current || !window.google?.maps) {
-              throw new Error('Map container or Google Maps not available');
-            }
-
-            mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
-              center: { lat: mapLocation.lat, lng: mapLocation.lng },
-              zoom: 20,
-              mapTypeId: 'satellite',
-              disableDefaultUI: false,
-              zoomControl: true,
-              mapTypeControl: true,
-              streetViewControl: true,
-              fullscreenControl: true,
-              tilt: 45
-            });
-
-            // Add marker
-            new window.google.maps.Marker({
-              position: { lat: mapLocation.lat, lng: mapLocation.lng },
-              map: mapInstanceRef.current,
-              title: addressData?.formattedAddress || 'Property Location',
-              animation: window.google.maps.Animation.DROP
-            });
-
-            // Clear timeout and proceed
-            clearTimeout(loadingTimeout);
-            setIsLoadingMap(false);
-            
-            // Auto-advance after showing map for 2 seconds
-            const timer = setTimeout(() => {
-              setStep(3);
-            }, 2000);
-            
-            return () => clearTimeout(timer);
-          } catch (error) {
-            clearTimeout(loadingTimeout);
-            throw error;
-          }
-        };
-
-        // Try to initialize immediately, or wait a bit if needed
-        if (window.google.maps.Map) {
-          return initMap();
-        } else {
-          // Wait for Maps API to be fully loaded
-          const checkInterval = setInterval(() => {
-            if (window.google?.maps?.Map) {
-              clearInterval(checkInterval);
-              initMap();
-            }
-          }, 100);
-          
-          // Fallback timeout
-          setTimeout(() => {
-            clearInterval(checkInterval);
-            if (!mapInstanceRef.current) {
-              clearTimeout(loadingTimeout);
-              setIsLoadingMap(false);
-              setErrors({ map: 'Map API not ready. Continuing...' });
-              setTimeout(() => setStep(3), 500);
-            }
-          }, 5000);
-          
-          return () => {
-            clearInterval(checkInterval);
-            clearTimeout(loadingTimeout);
-          };
-        }
-      } catch (error) {
-        clearTimeout(loadingTimeout);
-        console.error('Error initializing map:', error);
-        setIsLoadingMap(false);
-        setErrors({ map: 'Unable to load map. Continuing...' });
-        setTimeout(() => setStep(3), 1000);
-      }
-    } else if (step === 2 && (!mapLocation || !mapLocation.lat || !mapLocation.lng)) {
-      // No map location, skip to next step
-      setIsLoadingMap(false);
-      setTimeout(() => setStep(3), 500);
-    }
-  }, [step, mapLocation, addressData]);
+  // Map step removed - address goes directly to property details
 
   // Load saved data
   useEffect(() => {
@@ -568,7 +463,7 @@ export default function EnhancedQuoteWidget() {
         } else if (savedPropertyData) {
           setStep(3);
         } else {
-          setStep(2);
+          setStep(3);
         }
       } catch (error) {
         console.error('Error loading saved address:', error);
@@ -760,7 +655,7 @@ export default function EnhancedQuoteWidget() {
           
           if (parsedAddress.lat && parsedAddress.lng) {
             setIsLoadingMap(true);
-            setStep(2);
+            setStep(3);
           } else {
             setStep(3);
           }
@@ -852,8 +747,6 @@ export default function EnhancedQuoteWidget() {
       if (validatePropertyStep()) {
         setStep(4);
       }
-    } else if (step === 2) {
-      setStep(3);
     }
   };
 
@@ -861,9 +754,7 @@ export default function EnhancedQuoteWidget() {
     if (step === 4) {
       setStep(3);
     } else if (step === 3) {
-      setStep(2);
-    } else if (step === 2) {
-      setStep(1);
+      setStep(1); // Skip step 2 (map), go directly to address input
     }
   };
 
@@ -1172,62 +1063,6 @@ export default function EnhancedQuoteWidget() {
         {errors.address && <p className="text-red-400 text-sm mt-3">{errors.address}</p>}
         {errors.api && <p className="text-red-400 text-sm mt-3">{errors.api}</p>}
         {errors.autocomplete && <p className="text-red-400 text-sm mt-3">{errors.autocomplete}</p>}
-      </div>
-    );
-  }
-
-  // Step 2: Map View
-  if (step === 2 && mapLocation && mapLocation.lat && mapLocation.lng) {
-    return (
-      <div className="bg-white/10 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:p-8 border border-white/20 shadow-2xl">
-        <div className="mb-4">
-          <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">📍 Location Confirmed</h3>
-          <p className="text-gray-300 text-sm sm:text-base">{addressData?.formattedAddress}</p>
-        </div>
-        <div className="relative">
-          {isLoadingMap ? (
-            <div className="w-full h-64 sm:h-80 md:h-96 rounded-xl bg-gray-800/50 flex items-center justify-center">
-              <div className="text-center">
-                <svg className="animate-spin h-8 w-8 text-orange-500 mx-auto mb-2" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-                <p className="text-gray-300 text-sm mb-4">Loading satellite view...</p>
-                <button
-                  onClick={() => {
-                    setIsLoadingMap(false);
-                    setStep(3);
-                  }}
-                  className="px-4 py-2 bg-gray-700/80 hover:bg-gray-600/80 text-white text-sm rounded-lg transition-colors"
-                >
-                  Skip Map
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div ref={mapRef} className="w-full h-64 sm:h-80 md:h-96 rounded-xl overflow-hidden border-2 border-white/20 relative" style={{ minHeight: '256px' }}>
-              {/* Real quotes will be displayed after form submission */}
-            </div>
-          )}
-        </div>
-        <div className="mt-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-green-400">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
-            <p className="text-sm font-medium">Address verified</p>
-          </div>
-          <button
-            onClick={handleBack}
-            className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-lg transition-all"
-            aria-label="Go back"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            <span className="hidden sm:inline">Back</span>
-          </button>
-        </div>
       </div>
     );
   }
