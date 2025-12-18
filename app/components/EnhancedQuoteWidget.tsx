@@ -234,20 +234,28 @@ export default function EnhancedQuoteWidget() {
 
   const initializeAutocomplete = useCallback(() => {
     if (!window.google || !window.google.maps || !window.google.maps.places) {
+      console.log('Google Maps API not available');
       return;
     }
     
     if (!addressInputRef.current) {
+      console.log('Address input ref not available');
       return;
     }
     
     // Don't reinitialize if already set up
     if (autocomplete) {
+      console.log('Autocomplete already initialized');
       return;
     }
 
     try {
       const inputElement = addressInputRef.current;
+      
+      // Clear any existing autocomplete first
+      if (inputElement.dataset.autocompleteInitialized === 'true') {
+        return;
+      }
       
       // Enhanced autocomplete configuration for better Florida address search
       const autocompleteInstance = new window.google.maps.places.Autocomplete(inputElement, {
@@ -272,6 +280,9 @@ export default function EnhancedQuoteWidget() {
           new window.google.maps.LatLng(31.000968, -79.974307)  // Northeast corner of FL
         )
       });
+      
+      // Mark as initialized
+      inputElement.dataset.autocompleteInitialized = 'true';
 
       // Listen for place selection
       autocompleteInstance.addListener('place_changed', () => {
@@ -334,9 +345,11 @@ export default function EnhancedQuoteWidget() {
       }
 
       setAutocomplete(autocompleteInstance);
+      console.log('Autocomplete initialized successfully');
     } catch (error) {
       console.error('Error initializing autocomplete:', error);
       setErrors({ autocomplete: 'Address search unavailable. Please try again.' });
+      setAllowManualEntry(true);
     }
   }, [autocomplete, parseAddressComponents, validateAddressData]);
 
@@ -345,11 +358,33 @@ export default function EnhancedQuoteWidget() {
     if (step !== 1) return;
     
     const tryInitialize = () => {
-      if (autocomplete) return; // Already initialized
-      if (!addressInputRef.current) return; // Input not ready
-      if (!googleMapsLoaded) return; // Maps not loaded
-      if (!window.google?.maps?.places) return; // API not available
+      if (autocomplete) {
+        console.log('Autocomplete already exists, skipping');
+        return; // Already initialized
+      }
+      if (!addressInputRef.current) {
+        console.log('Address input not ready');
+        return; // Input not ready
+      }
+      if (!googleMapsLoaded && !allowManualEntry) {
+        console.log('Google Maps not loaded yet');
+        return; // Maps not loaded
+      }
+      if (!window.google?.maps?.places && !allowManualEntry) {
+        console.log('Google Maps Places API not available');
+        return; // API not available
+      }
       
+      // If Google Maps is not available, enable manual entry
+      if (!googleMapsLoaded || !window.google?.maps?.places) {
+        if (!allowManualEntry) {
+          console.log('Enabling manual entry mode');
+          setAllowManualEntry(true);
+        }
+        return;
+      }
+      
+      console.log('Attempting to initialize autocomplete...');
       initializeAutocomplete();
     };
 
@@ -361,13 +396,14 @@ export default function EnhancedQuoteWidget() {
       setTimeout(tryInitialize, 100),
       setTimeout(tryInitialize, 300),
       setTimeout(tryInitialize, 500),
-      setTimeout(tryInitialize, 1000)
+      setTimeout(tryInitialize, 1000),
+      setTimeout(tryInitialize, 2000) // Add one more attempt
     ];
     
     return () => {
       timers.forEach(timer => clearTimeout(timer));
     };
-  }, [step, googleMapsLoaded, autocomplete, initializeAutocomplete]);
+  }, [step, googleMapsLoaded, autocomplete, initializeAutocomplete, allowManualEntry]);
 
   // Sync input value when it changes programmatically (but don't interfere with autocomplete typing)
   useEffect(() => {
@@ -1021,8 +1057,14 @@ export default function EnhancedQuoteWidget() {
               <span className="text-green-400 text-xs sm:text-sm font-semibold">Real Quotes from Multiple Carriers</span>
             </div>
           </div>
-          {googleMapsLoaded && !mapsApiError && (
+          {googleMapsLoaded && !mapsApiError && autocomplete && (
             <p className="text-gray-400 text-sm mt-1">Start typing and select from suggestions</p>
+          )}
+          {(!googleMapsLoaded || mapsApiError || !autocomplete) && !allowManualEntry && (
+            <p className="text-gray-400 text-sm mt-1">Enter your Florida address below</p>
+          )}
+          {allowManualEntry && (
+            <p className="text-orange-400 text-sm mt-1">Enter your complete Florida address</p>
           )}
         </div>
         <div className="relative mb-3 sm:mb-4">
@@ -1049,13 +1091,12 @@ export default function EnhancedQuoteWidget() {
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                if (allowManualEntry || !googleMapsLoaded || mapsApiError || !autocomplete) {
-                  e.preventDefault();
-                  if (addressInputRef.current) {
-                    setAddressInputValue(addressInputRef.current.value);
-                  }
-                  handleManualAddressSubmit();
+                e.preventDefault();
+                if (addressInputRef.current) {
+                  setAddressInputValue(addressInputRef.current.value);
                 }
+                // Always allow manual submission if Enter is pressed
+                handleManualAddressSubmit();
               }
             }}
             disabled={false}
@@ -1065,21 +1106,25 @@ export default function EnhancedQuoteWidget() {
           />
           {/* Google Places Autocomplete will inject its dropdown here automatically */}
         </div>
-        {/* Debug info - hidden in production, only show in development console */}
-        {process.env.NODE_ENV === 'development' && false && (
-          <div className="mt-2 text-xs text-gray-400">
-            Status: {googleMapsLoaded ? '✓ Maps Loaded' : '⏳ Loading...'} | 
-            Autocomplete: {autocomplete ? '✓ Active' : '✗ Not initialized'} |
-            API Key: {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ? '✓ Set' : '✗ Missing'}
+        {/* Debug info - show in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-2 text-xs text-gray-400 p-2 bg-black/20 rounded">
+            <div>Status: {googleMapsLoaded ? '✓ Maps Loaded' : '⏳ Loading...'}</div>
+            <div>Autocomplete: {autocomplete ? '✓ Active' : '✗ Not initialized'}</div>
+            <div>API Key: {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ? '✓ Set' : '✗ Missing'}</div>
+            <div>Manual Entry: {allowManualEntry ? '✓ Enabled' : '✗ Disabled'}</div>
+            <div>Maps Error: {mapsApiError ? '✗ Error' : '✓ OK'}</div>
           </div>
         )}
         {!googleMapsLoaded && !allowManualEntry && !mapsApiError && (
           <p className="text-gray-400 text-sm mt-3">Loading address search...</p>
         )}
-        {(mapsApiError || allowManualEntry) && (
+        {(mapsApiError || allowManualEntry || (!googleMapsLoaded && !autocomplete)) && (
           <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
             <p className="text-yellow-300 text-sm mb-2 font-medium">
-              {mapsApiError ? 'Address autocomplete unavailable. Enter your complete address manually.' : 'Enter your complete Florida address below.'}
+              {mapsApiError ? 'Address autocomplete unavailable. Enter your complete address manually.' : 
+               !googleMapsLoaded ? 'Enter your complete Florida address below (autocomplete loading...)' :
+               'Enter your complete Florida address below.'}
             </p>
             <p className="text-yellow-200/80 text-xs mb-3">
               Include: Street address, City, State (FL), and Zip code<br />
