@@ -857,6 +857,16 @@ export default function EnhancedQuoteWidget() {
     }
   };
 
+  const handleBack = () => {
+    if (step === 4) {
+      setStep(3);
+    } else if (step === 3) {
+      setStep(2);
+    } else if (step === 2) {
+      setStep(1);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!validateContactStep()) {
       setIsSubmitting(false);
@@ -1200,11 +1210,23 @@ export default function EnhancedQuoteWidget() {
             </div>
           )}
         </div>
-        <div className="mt-4 flex items-center gap-2 text-green-400">
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-          <p className="text-sm font-medium">Address verified</p>
+        <div className="mt-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-green-400">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <p className="text-sm font-medium">Address verified</p>
+          </div>
+          <button
+            onClick={handleBack}
+            className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-lg transition-all"
+            aria-label="Go back"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="hidden sm:inline">Back</span>
+          </button>
         </div>
       </div>
     );
@@ -1254,12 +1276,23 @@ export default function EnhancedQuoteWidget() {
             {errors.yearBuilt && <p className="text-red-400 text-sm mt-2">{errors.yearBuilt}</p>}
           </div>
         </div>
-        <button
-          onClick={handleNext}
-          className="w-full mt-6 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-4 rounded-full font-bold text-lg transition-all shadow-xl hover:scale-105"
-        >
-          Continue
-        </button>
+        <div className="flex gap-3 mt-6">
+          <button
+            onClick={handleBack}
+            className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-white/10 hover:bg-white/20 text-white rounded-full font-semibold text-lg transition-all shadow-lg hover:scale-105"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+          <button
+            onClick={handleNext}
+            className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-4 rounded-full font-bold text-lg transition-all shadow-xl hover:scale-105"
+          >
+            Continue
+          </button>
+        </div>
       </div>
     );
   }
@@ -1366,13 +1399,24 @@ export default function EnhancedQuoteWidget() {
            Text STOP to (772) 244-4350 to unsubscribe.
          </p>
          
-         <button
-           onClick={handleSubmit}
-           disabled={isSubmitting}
-           className="w-full mt-6 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-4 rounded-full font-bold text-lg transition-all shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-         >
-           {isSubmitting ? 'Getting Quotes...' : 'Get My Free Quotes'}
-         </button>
+         <div className="flex gap-3 mt-6">
+           <button
+             onClick={handleBack}
+             className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-white/10 hover:bg-white/20 text-white rounded-full font-semibold text-lg transition-all shadow-lg hover:scale-105"
+           >
+             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+             </svg>
+             Back
+           </button>
+           <button
+             onClick={handleSubmit}
+             disabled={isSubmitting}
+             className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-4 rounded-full font-bold text-lg transition-all shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+           >
+             {isSubmitting ? 'Getting Quotes...' : 'Get My Free Quotes'}
+           </button>
+         </div>
       </div>
     );
   }
