@@ -500,15 +500,40 @@ export default function EnhancedQuoteWidget() {
       return;
     }
 
-    // Basic validation - check if it contains "FL" or "Florida"
-    const addressUpper = addressInputValue.toUpperCase();
-    if (!addressUpper.includes('FL') && !addressUpper.includes('FLORIDA')) {
-      setErrors({ address: 'Please enter a Florida address' });
+    // More lenient validation - check if it contains "FL" or "Florida", or if it looks like a valid address
+    const addressUpperCheck = addressInputValue.toUpperCase().trim();
+    const hasFL = addressUpperCheck.includes('FL') || addressUpperCheck.includes('FLORIDA');
+    
+    // If no FL/Florida, check if it looks like a complete address (has zip code or city pattern)
+    const hasZipCode = /\b\d{5}(?:-\d{4})?\b/.test(addressInputValue);
+    const hasCityPattern = /[A-Za-z\s]+,\s*[A-Za-z]{2}/.test(addressInputValue);
+    const looksLikeAddress = hasZipCode || hasCityPattern || addressInputValue.split(',').length >= 2;
+    
+    if (!hasFL && !looksLikeAddress) {
+      setErrors({ address: 'Please enter a complete Florida address (e.g., 123 Main St, Miami, FL 33101)' });
       return;
     }
 
     // Try to extract zip code and city from the address string
-    const addressString = addressInputValue.trim();
+    let addressString = addressInputValue.trim();
+    
+    // Automatically add "FL" if not present and address looks complete
+    const addressUpper = addressString.toUpperCase();
+    if (!addressUpper.includes('FL') && !addressUpper.includes('FLORIDA')) {
+      // If address has a zip code or city pattern, add ", FL" before the zip or at the end
+      const zipMatch = addressString.match(/\b(\d{5}(?:-\d{4})?)\b/);
+      if (zipMatch) {
+        // Add FL before zip code
+        addressString = addressString.replace(/\b(\d{5}(?:-\d{4})?)\b/, 'FL $1');
+      } else if (addressString.includes(',')) {
+        // Add ", FL" at the end if there's already a comma (city, state pattern)
+        addressString = `${addressString}, FL`;
+      } else {
+        // Just add ", FL" at the end
+        addressString = `${addressString}, FL`;
+      }
+    }
+    
     const zipMatch = addressString.match(/\b(\d{5}(?:-\d{4})?)\b/);
     const zipCode = zipMatch ? zipMatch[1] : '';
     
@@ -1025,8 +1050,8 @@ export default function EnhancedQuoteWidget() {
             <div>Maps Error: {mapsApiError ? '✗ Error' : '✓ OK'}</div>
           </div>
         )}
-        {/* Only show manual entry instructions if autocomplete is definitely not available */}
-        {(mapsApiError || (allowManualEntry && !googleMapsLoaded)) && (
+        {/* Show manual entry button - always available as fallback */}
+        {!autocomplete && (
           <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
             <p className="text-yellow-300 text-sm mb-2 font-medium">
               {mapsApiError ? 'Address autocomplete unavailable. Enter your complete address manually.' : 
