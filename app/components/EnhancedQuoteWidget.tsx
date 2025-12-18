@@ -118,6 +118,9 @@ export default function EnhancedQuoteWidget() {
     
     // Only load Google Maps if API key is provided
     if (!apiKey) {
+      console.warn('⚠️ Google Maps API key not found');
+      console.warn('💡 Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to .env.local');
+      console.warn('📖 See GOOGLE_MAPS_SETUP.md for instructions');
       setAllowManualEntry(true);
       return;
     }
@@ -138,14 +141,21 @@ export default function EnhancedQuoteWidget() {
       setMapsApiError(false);
     };
     script.onerror = () => {
-      console.error('Failed to load Google Maps API');
+      console.error('❌ Failed to load Google Maps API');
+      console.error('💡 Check: 1) Places API enabled? 2) API key restrictions? 3) Billing enabled?');
+      console.error('📖 See FIX_GOOGLE_MAPS_API.md for detailed instructions');
       setMapsApiError(true);
       setAllowManualEntry(true);
     };
     
     // Handle API key errors
     window.gm_authFailure = () => {
-      console.error('Google Maps API key error');
+      console.error('❌ Google Maps API key error');
+      console.error('💡 Common issues:');
+      console.error('   1. Places API not enabled - Enable it in Google Cloud Console');
+      console.error('   2. API key restrictions blocking localhost:3000');
+      console.error('   3. Billing not enabled (free tier available)');
+      console.error('📖 See FIX_GOOGLE_MAPS_API.md for step-by-step fixes');
       setMapsApiError(true);
       setAllowManualEntry(true);
       setGoogleMapsLoaded(false);
@@ -356,10 +366,12 @@ export default function EnhancedQuoteWidget() {
       }
 
       setAutocomplete(autocompleteInstance);
-      console.log('Autocomplete initialized successfully');
+      console.log('✅ Autocomplete initialized successfully');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error('Error initializing autocomplete:', error);
+      console.error('❌ Error initializing autocomplete:', error);
+      console.error('💡 Check browser console for Google Maps API errors');
+      console.error('📖 See FIX_GOOGLE_MAPS_API.md for troubleshooting');
       setErrors({ autocomplete: 'Address search unavailable. Please try again.' });
       setAllowManualEntry(true);
       // Clear the dataset flag on error so we can retry
@@ -377,31 +389,27 @@ export default function EnhancedQuoteWidget() {
     const tryInitialize = () => {
       // Check if element is already initialized
       if (addressInputRef.current?.dataset.autocompleteInitialized === 'true') {
-        console.log('Autocomplete already initialized on element');
         return;
       }
       
       if (!addressInputRef.current) {
-        console.log('Address input not ready');
         return; // Input not ready
       }
       
-      // Wait for Google Maps to load, but don't block the input field
+      // Wait for Google Maps to load
       if (!googleMapsLoaded) {
-        console.log('Google Maps not loaded yet, will retry...');
         return; // Maps not loaded yet, will retry
       }
       
       if (!window.google?.maps?.places) {
-        console.log('Google Maps Places API not available');
-        // Only enable manual entry if we're sure it won't load
-        if (!allowManualEntry && mapsApiError) {
+        // If we've been waiting too long and there's an error, enable manual entry
+        if (mapsApiError && !allowManualEntry) {
           setAllowManualEntry(true);
         }
         return; // API not available
       }
       
-      console.log('Attempting to initialize autocomplete...');
+      // All conditions met, initialize autocomplete
       initializeAutocomplete();
     };
 
@@ -414,13 +422,14 @@ export default function EnhancedQuoteWidget() {
       setTimeout(tryInitialize, 300),
       setTimeout(tryInitialize, 500),
       setTimeout(tryInitialize, 1000),
-      setTimeout(tryInitialize, 2000) // Add one more attempt
+      setTimeout(tryInitialize, 2000),
+      setTimeout(tryInitialize, 3000) // One more attempt after 3 seconds
     ];
     
     return () => {
       timers.forEach(timer => clearTimeout(timer));
     };
-  }, [step, googleMapsLoaded, initializeAutocomplete, allowManualEntry]); // Removed autocomplete from deps
+  }, [step, googleMapsLoaded, initializeAutocomplete, allowManualEntry, mapsApiError]);
 
   // Sync input value when it changes programmatically (but don't interfere with autocomplete typing)
   useEffect(() => {
