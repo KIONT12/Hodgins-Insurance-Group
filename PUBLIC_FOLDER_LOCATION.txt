@@ -1,0 +1,25 @@
+PUBLIC FOLDER LOCATION
+======================
+
+Full Path:
+C:\Users\foodl\OneDrive\Documents\coding\landing1\public
+
+To access:
+1. Open File Explorer (Windows key + E)
+2. Copy and paste this path into the address bar:
+   C:\Users\foodl\OneDrive\Documents\coding\landing1\public
+3. Press Enter
+
+Or navigate manually:
+1. Go to: C:\Users\foodl\OneDrive\Documents\coding\landing1
+2. Open the "public" folder
+
+Current files in public folder:
+- file.svg
+- globe.svg
+- next.svg
+- vercel.svg
+- window.svg
+
+DRAG YOUR LOGO FILE HERE and name it: jpeg.jpg
+
