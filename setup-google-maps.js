@@ -5,6 +5,7 @@
  * This script helps you set up your Google Maps API key
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');

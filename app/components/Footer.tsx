@@ -15,7 +15,7 @@ export default function Footer() {
               />
             </div>
             <p className="text-sm sm:text-base leading-relaxed mb-4 sm:mb-5 text-gray-200">
-              Florida's trusted partner for home insurance. Licensed, reliable, and dedicated to saving you money.
+              Florida&apos;s trusted partner for home insurance. Licensed, reliable, and dedicated to saving you money.
             </p>
             <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-4 shadow-lg">
               <div className="flex items-center gap-2 text-white font-bold text-base">

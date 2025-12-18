@@ -10,6 +10,7 @@ const AGENT_EMAIL = process.env.AGENT_EMAIL || 'agent@example.com';
 const WEBHOOK_URL = process.env.WEBHOOK_URL; // Optional: Zapier, Make.com, etc.
 
 // Lazy load Resend to avoid build-time errors
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let Resend: any = null;
 async function getResend() {
   if (!Resend && process.env.RESEND_API_KEY) {
@@ -95,8 +96,9 @@ export async function POST(request: NextRequest) {
         } else {
           console.log('⚠️  Resend package not available - email notifications disabled');
         }
-      } catch (emailError: any) {
-        console.error('❌ Email sending failed:', emailError.message);
+      } catch (emailError: unknown) {
+        const errorMessage = emailError instanceof Error ? emailError.message : 'Unknown error';
+        console.error('❌ Email sending failed:', errorMessage);
         // Don't fail the request if email fails - still return success
       }
     } else {
@@ -109,15 +111,17 @@ export async function POST(request: NextRequest) {
       message: 'Quote submitted successfully. An agent will contact you shortly.' 
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to submit quote';
     console.error('Quote submission error:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to submit quote' },
+      { success: false, error: errorMessage },
       { status: 500 }
     );
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function formatEmailContent(data: any): string {
   return `
     <!DOCTYPE html>

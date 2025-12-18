@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 declare global {
   interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     google: any;
     quoterushConfig?: {
       mapsKey?: string;
@@ -12,7 +13,7 @@ declare global {
   }
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+// const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 interface AddressData {
   formattedAddress: string;
@@ -45,15 +46,17 @@ export default function EnhancedQuoteWidget() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [autocomplete, setAutocomplete] = useState<any>(null);
   const [isLoadingMap, setIsLoadingMap] = useState(false);
-  const [quotePreview, setQuotePreview] = useState({ annual: null as number | null, monthly: null as number | null });
+  const [, setQuotePreview] = useState({ annual: null as number | null, monthly: null as number | null });
   const [reviewDate, setReviewDate] = useState('');
   const [reviewTime, setReviewTime] = useState('');
   const [mapsApiError, setMapsApiError] = useState(false);
   const [allowManualEntry, setAllowManualEntry] = useState(false);
 
   const mapRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapInstanceRef = useRef<any>(null);
   const addressInputRef = useRef<HTMLInputElement>(null);
 
@@ -158,6 +161,7 @@ export default function EnhancedQuoteWidget() {
   }, []);
 
   // Enhanced address parsing function
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const parseAddressComponents = useCallback((components: any[]): AddressData | null => {
     const addressInfo: AddressData = {
       formattedAddress: '',
@@ -173,6 +177,7 @@ export default function EnhancedQuoteWidget() {
     };
 
     // Parse all address components
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     components.forEach((component: any) => {
       const types = component.types;
       
@@ -257,7 +262,7 @@ export default function EnhancedQuoteWidget() {
         try {
           // Try to clean up existing autocomplete
           window.google.maps.event.clearInstanceListeners(autocomplete);
-        } catch (e) {
+        } catch {
           console.log('Could not clear existing autocomplete listeners');
         }
       }
@@ -342,6 +347,7 @@ export default function EnhancedQuoteWidget() {
       
       // Also listen for input changes to sync state (for manual typing)
       if (addressInputRef.current) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         addressInputRef.current.addEventListener('input', (e: any) => {
           if (e.target && !autocompleteInstance.getPlace()) {
             setAddressInputValue(e.target.value);
@@ -351,6 +357,7 @@ export default function EnhancedQuoteWidget() {
 
       setAutocomplete(autocompleteInstance);
       console.log('Autocomplete initialized successfully');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Error initializing autocomplete:', error);
       setErrors({ autocomplete: 'Address search unavailable. Please try again.' });
@@ -360,6 +367,7 @@ export default function EnhancedQuoteWidget() {
         addressInputRef.current.dataset.autocompleteInitialized = 'false';
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parseAddressComponents, validateAddressData]); // Removed autocomplete from deps to prevent stale closures
 
   // Initialize autocomplete when ready
@@ -595,13 +603,7 @@ export default function EnhancedQuoteWidget() {
     }
   }, [contactData]);
 
-  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setAddressInputValue(value);
-    if (errors.address) {
-      setErrors((prev) => ({ ...prev, address: '' }));
-    }
-  };
+  // Removed unused handleAddressChange - using inline onChange instead
 
   const handleManualAddressSubmit = () => {
     if (!addressInputValue.trim()) {
@@ -687,6 +689,7 @@ export default function EnhancedQuoteWidget() {
         address: searchAddress,
         region: 'us', // Bias to US
         componentRestrictions: { country: 'us' }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       }, (results: any[], status: string) => {
         // Clear timeout if geocoding completes
         clearTimeout(timeout);
@@ -990,6 +993,7 @@ export default function EnhancedQuoteWidget() {
           } else {
             throw new Error(data.error || 'Submission failed');
           }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (fetchError: any) {
           // If API is unavailable, still show success and store data locally
           if (fetchError.name === 'AbortError' || 
@@ -1014,6 +1018,7 @@ export default function EnhancedQuoteWidget() {
           throw fetchError;
         }
       }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Submission error:', error);
       // Only show error if it's not a network/API unavailable error
@@ -1123,7 +1128,6 @@ export default function EnhancedQuoteWidget() {
             disabled={false}
             aria-label="Enter your Florida address"
             aria-autocomplete="list"
-            aria-expanded={autocomplete ? "true" : "false"}
           />
           {/* Google Places Autocomplete will inject its dropdown here automatically */}
         </div>
@@ -1270,7 +1274,7 @@ export default function EnhancedQuoteWidget() {
       <div className="bg-white/10 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:p-8 border border-white/20 shadow-2xl">
         <div className="mb-6">
           <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Contact Information</h3>
-          <p className="text-gray-300 text-sm sm:text-base">We'll send your quotes here</p>
+          <p className="text-gray-300 text-sm sm:text-base">We&apos;ll send your quotes here</p>
         </div>
         <div className="space-y-4">
           <div>
@@ -1360,7 +1364,7 @@ export default function EnhancedQuoteWidget() {
          
          {/* Consent text similar to harvest.insure */}
          <p className="text-gray-300 text-xs mt-4 text-center">
-           By pressing 'Get My Free Quotes' you agree to our{' '}
+           By pressing &apos;Get My Free Quotes&apos; you agree to our{' '}
            <a href="/terms" className="text-orange-400 hover:text-orange-300 underline">terms</a> and{' '}
            <a href="/privacy" className="text-orange-400 hover:text-orange-300 underline">privacy policy</a>, and consent to receive texts. 
            Text STOP to (772) 244-4350 to unsubscribe.
@@ -1403,7 +1407,7 @@ export default function EnhancedQuoteWidget() {
           </h3>
           <p className="text-gray-300 text-base sm:text-lg">
             {premiumData 
-              ? 'We\'ve compared quotes from multiple carriers. A licensed agent will contact you shortly to review your options.'
+              ? 'We&apos;ve compared quotes from multiple carriers. A licensed agent will contact you shortly to review your options.'
               : 'A licensed agent will contact you shortly to review your quotes and answer any questions.'}
           </p>
         </div>
