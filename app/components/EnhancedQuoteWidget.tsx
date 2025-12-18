@@ -253,10 +253,10 @@ export default function EnhancedQuoteWidget() {
       }
       
       // If autocomplete state exists but element isn't marked, clear it
-      if (autocomplete) {
+      if (autocomplete && window.google && window.google.maps && window.google.maps.event) {
         try {
           // Try to clean up existing autocomplete
-          google.maps.event.clearInstanceListeners(autocomplete);
+          window.google.maps.event.clearInstanceListeners(autocomplete);
         } catch (e) {
           console.log('Could not clear existing autocomplete listeners');
         }
