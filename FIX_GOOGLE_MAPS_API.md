@@ -64,13 +64,21 @@ Your API key is: `AIzaSyAXC5jsJFwYqx_D5ZfpiolxqLY28O0KhPg`
    - Click **"ADD AN ITEM"**
    - **Add these referrers (choose what you need):**
      - **Required for development:**
-       - `localhost:3000/*` ← **Add this one (your dev server)**
-     - **Optional but recommended:**
+       - `localhost:3000/*` ← **MUST ADD** (your dev server runs on port 3000)
+     - **Optional but recommended (explained below):**
        - `localhost:*/*` ← Allows any port (useful if you change ports)
        - `127.0.0.1:*/*` ← IP address version (backup)
      - **Usually not needed (but safe to add):**
        - `http://localhost:3000/*`
        - `https://localhost:3000/*`
+   
+   **What "Optional but recommended" means:**
+   - **You don't NEED them** - Your app will work with just `localhost:3000/*`
+   - **But they're helpful** - They prevent issues if:
+     - You run the server on a different port (like 3001, 3002, etc.)
+     - Your browser uses `127.0.0.1` instead of `localhost`
+     - You switch between different development setups
+   - **Think of it like:** Required = "Must have", Optional but recommended = "Nice to have, prevents future headaches"
    - **For production, also add your domain:**
      - `yourdomain.com/*`
      - `*.yourdomain.com/*`
