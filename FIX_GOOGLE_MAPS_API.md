@@ -6,15 +6,48 @@ Your API key is: `AIzaSyAXC5jsJFwYqx_D5ZfpiolxqLY28O0KhPg`
 
 ### Step 1: Enable Places API (REQUIRED)
 
+**Method 1: Direct Link (if page loads)**
 1. Go to: https://console.cloud.google.com/apis/library/places-backend.googleapis.com
 2. Click **"ENABLE"** button
 3. Wait for it to enable (takes a few seconds)
 
+**Method 2: Via API Library (if direct link fails)**
+1. Go to: https://console.cloud.google.com/apis/library
+2. Search for "Places API"
+3. Click on "Places API"
+4. Click **"ENABLE"** button
+
+**Method 3: Via API Dashboard**
+1. Go to: https://console.cloud.google.com/apis/dashboard
+2. Click **"+ ENABLE APIS AND SERVICES"** at the top
+3. Search for "Places API"
+4. Click on it and click **"ENABLE"**
+
 ### Step 2: Enable Maps JavaScript API (REQUIRED)
 
+**Method 1: Direct Link (if page loads)**
 1. Go to: https://console.cloud.google.com/apis/library/maps-javascript-backend.googleapis.com
 2. Click **"ENABLE"** button
 3. Wait for it to enable
+
+**Method 2: Via API Library (if direct link fails)**
+1. Go to: https://console.cloud.google.com/apis/library
+2. Search for "Maps JavaScript API"
+3. Click on "Maps JavaScript API"
+4. Click **"ENABLE"** button
+
+**Method 3: Via API Dashboard**
+1. Go to: https://console.cloud.google.com/apis/dashboard
+2. Click **"+ ENABLE APIS AND SERVICES"** at the top
+3. Search for "Maps JavaScript API"
+4. Click on it and click **"ENABLE"**
+
+**If pages won't load:**
+- Try refreshing the page (F5)
+- Try a different browser
+- Clear browser cache
+- Try incognito/private mode
+- Wait a few minutes and try again (Google Cloud Console can have temporary issues)
 
 ### Step 3: Fix API Key Restrictions
 
@@ -91,11 +124,20 @@ If you see errors, check the message and follow the fixes above.
 
 ## Still Not Working?
 
+### If Google Cloud Console pages won't load:
+1. **Try a different browser** (Chrome, Firefox, Edge)
+2. **Clear browser cache** (Ctrl+Shift+Delete)
+3. **Try incognito/private mode**
+4. **Wait 5-10 minutes** - Google Cloud Console can have temporary outages
+5. **Use the API Dashboard method** instead of direct links
+
+### If APIs are enabled but autocomplete still doesn't work:
 1. Check browser console (F12) for specific error messages
-2. Verify API key in `.env.local` matches the one above
-3. Make sure you restarted the dev server after changes
-4. Try clearing browser cache (Ctrl+Shift+Delete)
-5. Check Google Cloud Console for API usage/quota issues
+2. Verify API key in `.env.local` matches: `AIzaSyAXC5jsJFwYqx_D5ZfpiolxqLY28O0KhPg`
+3. Make sure you restarted the dev server after changes: `npm run dev`
+4. Check Google Cloud Console for API usage/quota issues
+5. Verify billing is enabled (even if free tier)
+6. Double-check API key restrictions allow `localhost:3000/*`
 
 ## Need Help?
 
