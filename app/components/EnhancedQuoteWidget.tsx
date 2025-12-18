@@ -1057,7 +1057,11 @@ export default function EnhancedQuoteWidget() {
     }
     if (addressInputRef.current) {
       addressInputRef.current.value = '';
+      // Clear autocomplete initialization flag to allow re-initialization
+      addressInputRef.current.dataset.autocompleteInitialized = 'false';
     }
+    // Clear autocomplete state to allow re-initialization
+    setAutocomplete(null);
   };
 
   // Step 1: Address Input
@@ -1098,7 +1102,7 @@ export default function EnhancedQuoteWidget() {
             placeholder={allowManualEntry ? "Enter complete address: 123 Main St, Miami, FL 33101" : "Start typing your Florida address..."}
             className="w-full pl-12 sm:pl-14 pr-4 py-4 sm:py-5 md:py-6 text-base sm:text-lg text-gray-900 bg-white border-2 border-gray-300 focus:border-orange-500 rounded-xl focus:ring-2 focus:ring-orange-500/30 outline-none transition-all shadow-lg hover:shadow-xl"
             autoComplete="off"
-            defaultValue={addressInputValue}
+            value={addressInputValue}
             onChange={(e) => {
               const value = e.target.value;
               setAddressInputValue(value);

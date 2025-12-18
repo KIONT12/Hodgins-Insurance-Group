@@ -129,6 +129,16 @@ body {
   z-index: 1;
 }
 
+/* Ensure Google Places Autocomplete dropdown is visible */
+.pac-container {
+  z-index: 10000 !important;
+  position: absolute !important;
+}
+
+.pac-container::after {
+  display: none !important;
+}
+
 /* Accessibility improvements */
 @media (prefers-reduced-motion: reduce) {
   *,
