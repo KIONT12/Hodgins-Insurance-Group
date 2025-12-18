@@ -349,15 +349,9 @@ export default function EnhancedQuoteWidget() {
         sessionStorage.setItem('quoteAddress', JSON.stringify(addressInfo));
       });
       
-      // Also listen for input changes to sync state (for manual typing)
-      if (addressInputRef.current) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        addressInputRef.current.addEventListener('input', (e: any) => {
-          if (e.target && !autocompleteInstance.getPlace()) {
-            setAddressInputValue(e.target.value);
-          }
-        });
-      }
+      // Also listen for input changes to sync state (for manual typing and autocomplete)
+      // Note: We use React's onChange handler for this instead of addEventListener
+      // to avoid conflicts and ensure proper cleanup
 
       setAutocomplete(autocompleteInstance);
       console.log('✅ Autocomplete initialized successfully');
@@ -1022,6 +1016,12 @@ export default function EnhancedQuoteWidget() {
               setAddressInputValue(value);
               if (errors.address) {
                 setErrors((prev) => ({ ...prev, address: '' }));
+              }
+            }}
+            onBlur={(e) => {
+              // Sync value when input loses focus (Google autocomplete might have changed it)
+              if (addressInputRef.current && addressInputRef.current.value !== addressInputValue) {
+                setAddressInputValue(addressInputRef.current.value);
               }
             }}
             onKeyDown={(e) => {
