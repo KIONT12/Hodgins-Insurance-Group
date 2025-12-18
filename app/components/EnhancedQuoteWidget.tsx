@@ -242,19 +242,24 @@ export default function EnhancedQuoteWidget() {
       console.log('Address input ref not available');
       return;
     }
-    
-    // Don't reinitialize if already set up
-    if (autocomplete) {
-      console.log('Autocomplete already initialized');
-      return;
-    }
 
     try {
       const inputElement = addressInputRef.current;
       
-      // Clear any existing autocomplete first
+      // Clear any existing autocomplete first to prevent duplicates
       if (inputElement.dataset.autocompleteInitialized === 'true') {
+        console.log('Autocomplete already initialized on this element');
         return;
+      }
+      
+      // If autocomplete state exists but element isn't marked, clear it
+      if (autocomplete) {
+        try {
+          // Try to clean up existing autocomplete
+          google.maps.event.clearInstanceListeners(autocomplete);
+        } catch (e) {
+          console.log('Could not clear existing autocomplete listeners');
+        }
       }
       
       // Enhanced autocomplete configuration for better Florida address search
@@ -346,32 +351,44 @@ export default function EnhancedQuoteWidget() {
 
       setAutocomplete(autocompleteInstance);
       console.log('Autocomplete initialized successfully');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error initializing autocomplete:', error);
       setErrors({ autocomplete: 'Address search unavailable. Please try again.' });
       setAllowManualEntry(true);
+      // Clear the dataset flag on error so we can retry
+      if (addressInputRef.current) {
+        addressInputRef.current.dataset.autocompleteInitialized = 'false';
+      }
     }
-  }, [autocomplete, parseAddressComponents, validateAddressData]);
+  }, [parseAddressComponents, validateAddressData]); // Removed autocomplete from deps to prevent stale closures
 
   // Initialize autocomplete when ready
   useEffect(() => {
     if (step !== 1) return;
     
     const tryInitialize = () => {
-      if (autocomplete) {
-        console.log('Autocomplete already exists, skipping');
-        return; // Already initialized
+      // Check if element is already initialized
+      if (addressInputRef.current?.dataset.autocompleteInitialized === 'true') {
+        console.log('Autocomplete already initialized on element');
+        return;
       }
+      
       if (!addressInputRef.current) {
         console.log('Address input not ready');
         return; // Input not ready
       }
+      
       if (!googleMapsLoaded && !allowManualEntry) {
         console.log('Google Maps not loaded yet');
         return; // Maps not loaded
       }
+      
       if (!window.google?.maps?.places && !allowManualEntry) {
         console.log('Google Maps Places API not available');
+        // Enable manual entry if API is not available
+        if (!allowManualEntry) {
+          setAllowManualEntry(true);
+        }
         return; // API not available
       }
       
@@ -403,7 +420,7 @@ export default function EnhancedQuoteWidget() {
     return () => {
       timers.forEach(timer => clearTimeout(timer));
     };
-  }, [step, googleMapsLoaded, autocomplete, initializeAutocomplete, allowManualEntry]);
+  }, [step, googleMapsLoaded, initializeAutocomplete, allowManualEntry]); // Removed autocomplete from deps
 
   // Sync input value when it changes programmatically (but don't interfere with autocomplete typing)
   useEffect(() => {
