@@ -386,27 +386,19 @@ export default function EnhancedQuoteWidget() {
         return; // Input not ready
       }
       
-      if (!googleMapsLoaded && !allowManualEntry) {
-        console.log('Google Maps not loaded yet');
-        return; // Maps not loaded
+      // Wait for Google Maps to load, but don't block the input field
+      if (!googleMapsLoaded) {
+        console.log('Google Maps not loaded yet, will retry...');
+        return; // Maps not loaded yet, will retry
       }
       
-      if (!window.google?.maps?.places && !allowManualEntry) {
+      if (!window.google?.maps?.places) {
         console.log('Google Maps Places API not available');
-        // Enable manual entry if API is not available
-        if (!allowManualEntry) {
+        // Only enable manual entry if we're sure it won't load
+        if (!allowManualEntry && mapsApiError) {
           setAllowManualEntry(true);
         }
         return; // API not available
-      }
-      
-      // If Google Maps is not available, enable manual entry
-      if (!googleMapsLoaded || !window.google?.maps?.places) {
-        if (!allowManualEntry) {
-          console.log('Enabling manual entry mode');
-          setAllowManualEntry(true);
-        }
-        return;
       }
       
       console.log('Attempting to initialize autocomplete...');
@@ -1083,14 +1075,12 @@ export default function EnhancedQuoteWidget() {
               <span className="text-green-400 text-xs sm:text-sm font-semibold">Real Quotes from Multiple Carriers</span>
             </div>
           </div>
-          {googleMapsLoaded && !mapsApiError && autocomplete && (
+          {googleMapsLoaded && !mapsApiError && autocomplete ? (
             <p className="text-gray-400 text-sm mt-1">Start typing and select from suggestions</p>
-          )}
-          {(!googleMapsLoaded || mapsApiError || !autocomplete) && !allowManualEntry && (
+          ) : googleMapsLoaded && !mapsApiError ? (
             <p className="text-gray-400 text-sm mt-1">Enter your Florida address below</p>
-          )}
-          {allowManualEntry && (
-            <p className="text-orange-400 text-sm mt-1">Enter your complete Florida address</p>
+          ) : (
+            <p className="text-gray-400 text-sm mt-1">Enter your Florida address below</p>
           )}
         </div>
         <div className="relative mb-3 sm:mb-4">
@@ -1141,14 +1131,11 @@ export default function EnhancedQuoteWidget() {
             <div>Maps Error: {mapsApiError ? '✗ Error' : '✓ OK'}</div>
           </div>
         )}
-        {!googleMapsLoaded && !allowManualEntry && !mapsApiError && (
-          <p className="text-gray-400 text-sm mt-3">Loading address search...</p>
-        )}
-        {(mapsApiError || allowManualEntry || (!googleMapsLoaded && !autocomplete)) && (
+        {/* Only show manual entry instructions if autocomplete is definitely not available */}
+        {(mapsApiError || (allowManualEntry && !googleMapsLoaded)) && (
           <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
             <p className="text-yellow-300 text-sm mb-2 font-medium">
               {mapsApiError ? 'Address autocomplete unavailable. Enter your complete address manually.' : 
-               !googleMapsLoaded ? 'Enter your complete Florida address below (autocomplete loading...)' :
                'Enter your complete Florida address below.'}
             </p>
             <p className="text-yellow-200/80 text-xs mb-3">
