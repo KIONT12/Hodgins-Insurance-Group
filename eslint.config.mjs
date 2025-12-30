@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Ignore compiled server code
+    "server/dist/**",
+    "server/data/**",
+    // Ignore setup scripts
+    "setup-google-maps.js",
   ]),
 ]);
 

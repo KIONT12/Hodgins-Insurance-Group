@@ -17,6 +17,7 @@ interface Quote {
   reviewTime?: string;
   timestamp: string;
   source?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
@@ -40,7 +41,7 @@ async function loadQuotes(): Promise<Quote[]> {
     await ensureDataDirectory();
     const data = await fs.readFile(QUOTES_FILE, 'utf-8');
     return JSON.parse(data);
-  } catch (error) {
+  } catch {
     // File doesn't exist yet, return empty array
     return [];
   }
@@ -82,6 +83,7 @@ export const QuoteService = {
   },
 
   // Send webhook notification
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async sendWebhook(quoteData: any): Promise<void> {
     if (!process.env.WEBHOOK_URL) {
       return;

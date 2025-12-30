@@ -9,6 +9,7 @@ if (RESEND_API_KEY) {
   resend = new Resend(RESEND_API_KEY);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function formatEmailContent(data: any): string {
   return `
     <!DOCTYPE html>
@@ -99,6 +100,7 @@ function formatEmailContent(data: any): string {
 }
 
 export const EmailService = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async sendQuoteNotification(quoteData: any): Promise<void> {
     if (!resend) {
       console.log('⚠️  Resend not configured - skipping email notification');

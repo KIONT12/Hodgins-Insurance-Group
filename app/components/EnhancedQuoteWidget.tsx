@@ -1022,7 +1022,7 @@ export default function EnhancedQuoteWidget() {
                 setErrors((prev) => ({ ...prev, address: '' }));
               }
             }}
-            onBlur={(e) => {
+            onBlur={() => {
               // Sync value when input loses focus (Google autocomplete might have changed it)
               if (addressInputRef.current && addressInputRef.current.value !== addressInputValue) {
                 setAddressInputValue(addressInputRef.current.value);
