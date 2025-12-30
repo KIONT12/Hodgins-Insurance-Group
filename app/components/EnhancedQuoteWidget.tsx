@@ -878,8 +878,12 @@ export default function EnhancedQuoteWidget() {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
           
-          // Try Next.js API route first (same domain, no CORS issues)
-          const apiRoute = '/api/quote';
+          // Try backend API first, fallback to Next.js API route
+          // In production, NEXT_PUBLIC_API_URL should be set to your backend URL
+          const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
+          const apiRoute = API_URL 
+            ? `${API_URL.replace(/\/$/, '')}/api/quotes` // Remove trailing slash
+            : '/api/quote';
           response = await fetch(apiRoute, {
             method: 'POST',
             headers: {
