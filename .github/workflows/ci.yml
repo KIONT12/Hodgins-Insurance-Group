@@ -24,7 +24,7 @@ jobs:
       run: npm ci
 
     - name: Run linter
-      run: npm run lint -- --max-warnings=100 || echo "Linter completed with warnings"
+      run: npx eslint . --max-warnings=100 || echo "Linter completed with warnings"
       continue-on-error: true
 
     - name: Build frontend
