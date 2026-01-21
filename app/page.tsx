@@ -25,6 +25,7 @@ export default function Home() {
                         src="/jpeg.jpg"
                         alt="HODGINS Insurance Group"
                         fill
+                        priority
                         className="object-contain"
                         sizes="(max-width: 640px) 120px, (max-width: 768px) 180px, (max-width: 1024px) 240px, (max-width: 1280px) 320px, 400px"
                       />
