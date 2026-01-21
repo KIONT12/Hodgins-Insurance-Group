@@ -28,9 +28,7 @@ jobs:
       continue-on-error: true
 
     - name: Build frontend
-      run: |
-        echo "Building frontend..."
-        npm run build 2>&1 | tee build.log || (cat build.log && exit 1)
+      run: npm run build
       env:
         NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyC_test_key_for_ci_build_only' }}
         NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || '' }}
