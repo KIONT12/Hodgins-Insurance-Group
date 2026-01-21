@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Hero from './components/Hero';
 import FAQ from './components/FAQ';
 import Footer from './components/Footer';
@@ -19,11 +20,15 @@ export default function Home() {
               <div className="flex items-center flex-shrink-0 min-w-0 flex-1">
                 <a href="#home" className="block group">
                   <div className="bg-black/95 backdrop-blur-sm px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 md:py-2 rounded-lg sm:rounded-xl md:rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-orange-500/30 group-hover:border-orange-500/50">
-                    <img
-                      src="/jpeg.jpg"
-                      alt="HODGINS Insurance Group"
-                      className="h-10 sm:h-14 md:h-20 lg:h-28 xl:h-32 w-auto max-w-[120px] sm:max-w-[180px] md:max-w-[240px] lg:max-w-[320px] xl:max-w-[400px] object-contain"
-                    />
+                    <div className="relative h-10 sm:h-14 md:h-20 lg:h-28 xl:h-32 w-[120px] sm:w-[180px] md:w-[240px] lg:w-[320px] xl:w-[400px]">
+                      <Image
+                        src="/jpeg.jpg"
+                        alt="HODGINS Insurance Group"
+                        fill
+                        className="object-contain"
+                        sizes="(max-width: 640px) 120px, (max-width: 768px) 180px, (max-width: 1024px) 240px, (max-width: 1280px) 320px, 400px"
+                      />
+                    </div>
                   </div>
                 </a>
               </div>

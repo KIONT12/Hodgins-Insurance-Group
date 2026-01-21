@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -8,11 +10,15 @@ export default function Footer() {
           {/* Company Info */}
           <div className="bg-white/10 backdrop-blur-md rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-white/20 shadow-2xl sm:col-span-2 md:col-span-1">
             <div className="bg-black/80 backdrop-blur-sm px-4 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl inline-block mb-4 sm:mb-5 border border-orange-500/30 hover:border-orange-500/50 transition-all">
-              <img
-                src="/jpeg.jpg"
-                alt="HODGINS Insurance Group"
-                className="h-14 sm:h-16 md:h-20 w-auto"
-              />
+              <div className="relative h-14 sm:h-16 md:h-20 w-[140px] sm:w-[160px] md:w-[200px]">
+                <Image
+                  src="/jpeg.jpg"
+                  alt="HODGINS Insurance Group"
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 640px) 140px, (max-width: 768px) 160px, 200px"
+                />
+              </div>
             </div>
             <p className="text-sm sm:text-base leading-relaxed mb-4 sm:mb-5 text-gray-200">
               Florida&apos;s trusted partner for home insurance. Licensed, reliable, and dedicated to saving you money.
